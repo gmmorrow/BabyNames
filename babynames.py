@@ -44,9 +44,31 @@ def extract_names(filename):
     ['2006', 'Aaliyah 91', 'Aaron 57', 'Abagail 895', ...]
     """
     names = []
-    # +++your code here+++
-    return names
-
+    with open(filename) as f:
+        text = f.read()
+    
+    year_match = re.search(r'Popularity\sin\s(\d\d\d\d)', text)
+    if not year_match:
+        print('Couldn\'t find the year!\n')
+        return None 
+    year = year_match.group(1)
+    names.append(year)
+    
+    tuples = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
+    names_to_rank = {}
+    for rank_tuple in tuples:
+        (rank, boy_name, girl_name) = rank_tuple
+        if boy_name not in names_to_rank:
+            names_to_rank[boy_name] = rank
+        if girl_name not in names_to_rank:   
+            names_to_rank[girl_name] = rank
+    
+    
+    sorted_names = sorted(names_to_rank.keys())
+    
+    for name in sorted_names:
+        names.append(name + " " + names_to_rank[name])
+    return names          
 
 def create_parser():
     """Create a command line parser object with 2 argument definitions."""
@@ -76,6 +98,17 @@ def main(args):
 
     # option flag
     create_summary = ns.summaryfile
+
+    for filename in file_list:
+        names = extract_names(filename)
+
+        text = '\n'.join(names)
+
+        if create_summary:
+            with open(filename + '.summary', 'w') as f:
+                f.write(text + '\n')
+        else:
+            print(text)
 
     # For each filename, call `extract_names()` with that single file.
     # Format the resulting list as a vertical list (separated by newline \n).
