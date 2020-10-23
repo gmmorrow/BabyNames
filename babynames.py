@@ -36,6 +36,9 @@ import re
 import argparse
 
 
+__author__ = "Gabrielle"
+
+
 def extract_names(filename):
     """
     Given a single file name for babyXXXX.html, returns a
@@ -46,29 +49,29 @@ def extract_names(filename):
     names = []
     with open(filename) as f:
         text = f.read()
-    
+
     year_match = re.search(r'Popularity\sin\s(\d\d\d\d)', text)
     if not year_match:
         print('Couldn\'t find the year!\n')
-        return None 
+        return None
     year = year_match.group(1)
     names.append(year)
-    
+
     tuples = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
     names_to_rank = {}
     for rank_tuple in tuples:
         (rank, boy_name, girl_name) = rank_tuple
         if boy_name not in names_to_rank:
             names_to_rank[boy_name] = rank
-        if girl_name not in names_to_rank:   
+        if girl_name not in names_to_rank:
             names_to_rank[girl_name] = rank
-    
-    
+
     sorted_names = sorted(names_to_rank.keys())
-    
+
     for name in sorted_names:
         names.append(name + " " + names_to_rank[name])
-    return names          
+    return names
+
 
 def create_parser():
     """Create a command line parser object with 2 argument definitions."""
